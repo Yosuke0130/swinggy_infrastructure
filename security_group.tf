@@ -28,7 +28,7 @@ resource "aws_security_group_rule" "bastion_in_https" {
   to_port           = 443
   cidr_blocks       = ["0.0.0.0/0"]
 }
-resource "aws_security_group_rule" "web_out_http" {
+resource "aws_security_group_rule" "bastion_out_http" {
   security_group_id        = aws_security_group.bastion_sg.id
   type                     = "egress"
   protocol                 = "tcp"
@@ -36,7 +36,7 @@ resource "aws_security_group_rule" "web_out_http" {
   to_port                  = 80
   source_security_group_id = aws_security_group.api_sg.id
 }
-resource "aws_security_group_rule" "web_out_https" {
+resource "aws_security_group_rule" "bastion_out_https" {
   security_group_id        = aws_security_group.bastion_sg.id
   type                     = "egress"
   protocol                 = "tcp"
@@ -44,13 +44,21 @@ resource "aws_security_group_rule" "web_out_https" {
   to_port                  = 443
   source_security_group_id = aws_security_group.api_sg.id
 }
-resource "aws_security_group_rule" "web_in_ssh" {
+resource "aws_security_group_rule" "bastion_in_ssh" {
+  security_group_id = aws_security_group.bastion_sg.id
+  type              = "ingress"
+  protocol          = "tcp"
+  from_port         = 22
+  to_port           = 22
+  cidercidr_blocks  = ["0.0.0.0/0"]
+}
+resource "aws_security_group_rule" "bastion_out_ssh" {
   security_group_id        = aws_security_group.bastion_sg.id
-  type                     = "ingress"
+  type                     = "engress"
   protocol                 = "tcp"
   from_port                = 22
   to_port                  = 22
-  source_security_group_id = ["0.0.0.0/0"]
+  source_security_group_id = aws_security_group.api_sg.id
 }
 
 # api security group
@@ -70,7 +78,7 @@ resource "aws_security_group_rule" "api_in_http" {
   protocol                 = "tcp"
   from_port                = 80
   to_port                  = 80
-  source_security_group_id = [aws_security_group.alb_sg.id,aws_security_group.bastion_sg.id]
+  source_security_group_id = [aws_security_group.alb_sg.id, aws_security_group.bastion_sg.id]
 }
 resource "aws_security_group_rule" "api_in_https" {
   security_group_id        = aws_security_group.api_sg.id
@@ -78,11 +86,27 @@ resource "aws_security_group_rule" "api_in_https" {
   protocol                 = "tcp"
   from_port                = 443
   to_port                  = 443
-  source_security_group_id = [aws_security_group.alb_sg.id,aws_security_group.bastion_sg.id]
+  source_security_group_id = [aws_security_group.alb_sg.id, aws_security_group.bastion_sg.id]
+}
+resource "aws_security_group_rule" "api_in_ssh" {
+  security_group_id        = aws_security_group.api_sg.id
+  type                     = "ingress"
+  protocol                 = "tcp"
+  from_port                = 22
+  to_port                  = 22
+  source_security_group_id = aws_security_group.bastion_sg.id
+}
+resource "aws_security_group_rule" "api_out_ssh" {
+  security_group_id        = aws_security_group.api_sg.id
+  type                     = "engress"
+  protocol                 = "tcp"
+  from_port                = 22
+  to_port                  = 22
+  source_security_group_id = aws_security_group.db_sg.id
 }
 resource "aws_security_group_rule" "api_out_tcp3306" {
   security_group_id        = aws_security_group.api_sg.id
-  type                     = "enngress"
+  type                     = "engress"
   protocol                 = "tcp"
   from_port                = 3306
   to_port                  = 3306
@@ -100,12 +124,21 @@ resource "aws_security_group" "db_sg" {
     Env     = var.environment
   }
 }
-resource "aws_security_group_rule" "db_in_dcp3306" {
+resource "aws_security_group_rule" "db_in_tcp3306" {
   security_group_id        = aws_security_group.db_sg.id
   type                     = "ingress"
   protocol                 = "tcp"
   from_port                = 3306
   to_port                  = 3306
+  source_security_group_id = aws_security_group.api_sg.id
+}
+
+resource "aws_security_group_rule" "db_in_ssh" {
+  security_group_id        = aws_security_group.db_sg.id
+  type                     = "ingress"
+  protocol                 = "tcp"
+  from_port                = 22
+  to_port                  = 22
   source_security_group_id = aws_security_group.api_sg.id
 }
 

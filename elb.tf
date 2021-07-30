@@ -43,5 +43,5 @@ resource "aws_lb_target_group" "alb_target_group" {
 resource "aws_lb_target_group_attachment" "instance" {
   target_group_arn = aws_lb_target_group.alb_target_group.arn
   #未作成
-  target_id        = aws_instance.api_server.id
+  target_id = aws_instance.api_server.id
 }
