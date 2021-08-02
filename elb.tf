@@ -9,9 +9,8 @@ resource "aws_lb" "alb" {
     aws_security_group.alb_sg.id
   ]
   subnets = [
-    aws_subnet.private_subnet_api.id,
-    #未作成
-    aws_subnet.private_subnet_api_2.id
+    aws_subnet.private_subnet_app.id,
+    aws_subnet.private_subnet_app_2.id
   ]
 }
 
@@ -42,6 +41,9 @@ resource "aws_lb_target_group" "alb_target_group" {
 
 resource "aws_lb_target_group_attachment" "instance" {
   target_group_arn = aws_lb_target_group.alb_target_group.arn
-  #未作成
-  target_id = aws_instance.api_server.id
+  target_id        = aws_instance.app-server.id
+}
+resource "aws_lb_target_group_attachment" "instance_2" {
+  target_group_arn = aws_lb_target_group.alb_target_group.arn
+  target_id        = aws_instance.app-server-2.id
 }

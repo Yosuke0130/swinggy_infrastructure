@@ -32,14 +32,27 @@ resource "aws_subnet" "public_subnet_bastion" {
   }
 }
 
-resource "aws_subnet" "private_subnet_api" {
+resource "aws_subnet" "private_subnet_app" {
   vpc_id                  = aws_vpc.vpc.id
   availability_zone       = "ap-northeast-1a"
   cidr_block              = "172.0.2.0/24"
   map_public_ip_on_launch = false
 
   tags = {
-    Name    = "${var.project}-${var.environment}-public-subnet-api"
+    Name    = "${var.project}-${var.environment}-public-subnet-app"
+    project = var.project
+    Env     = var.environment
+    type    = "private"
+  }
+}
+resource "aws_subnet" "private_subnet_app_2" {
+  vpc_id                  = aws_vpc.vpc.id
+  availability_zone       = "ap-northeast-1c"
+  cidr_block              = "172.0.4.0/24"
+  map_public_ip_on_launch = false
+
+  tags = {
+    Name    = "${var.project}-${var.environment}-public-subnet-app_2"
     project = var.project
     Env     = var.environment
     type    = "private"
@@ -77,18 +90,18 @@ resource "aws_route_table_association" "pubic_rt_bastion" {
   subnet_id      = aws_subnet.public_subnet_bastion.id
 }
 
-resource "aws_route_table" "private_rt_api" {
+resource "aws_route_table" "private_rt_app" {
   vpc_id = aws_vpc.vpc.id
   tags = {
-    Name    = "${var.project}-${var.environment}-private-rt-api"
+    Name    = "${var.project}-${var.environment}-private-rt-app"
     project = var.project
     Env     = var.environment
     type    = "private"
   }
 }
-resource "aws_route_table_association" "private_rt_api" {
-  route_table_id = aws_route_table.private_rt_api.id
-  subnet_id      = aws_subnet.private_subnet_api.id
+resource "aws_route_table_association" "private_rt_app" {
+  route_table_id = aws_route_table.private_rt_app.id
+  subnet_id      = aws_subnet.private_subnet_app.id
 }
 
 resource "aws_route_table" "private_rt_db" {

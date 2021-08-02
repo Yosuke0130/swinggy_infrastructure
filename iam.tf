@@ -1,7 +1,7 @@
 # ------------------------
 # IAM role
 # ------------------------
-resource "aws_iam_instance_profile" "app_ec2_profile" {
+resource "aws_iam_instance_profile" "api_ec2_profile" {
   name = aws_iam_role.api_iam_role.name
   role = aws_iam_role.api_iam_role.name
 }
@@ -23,6 +23,6 @@ data "aws_iam_policy_document" "ec2_assume_role" {
 
 resource "aws_iam_policy_attachment" "api_iam_role_ec2" {
   name       = "ec2_readonly_attachment"
-  roles      = [aws_iam_role.app_iam_role.name]
+  roles      = [aws_iam_role.api_iam_role.name]
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
 }
