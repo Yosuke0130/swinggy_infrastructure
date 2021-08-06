@@ -30,6 +30,7 @@ resource "aws_instance" "bastion-server" {
     project = var.project
     Env     = var.environment
   }
+
 }
 
 #app Server
@@ -47,6 +48,12 @@ resource "aws_instance" "app-server" {
     project = var.project
     Env     = var.environment
   }
+
+  user_data = <<-EOF
+    #!bin/bash
+    sudo amazon-linux-extras install nginx1
+    sudo systemctl start nginx
+  EOF
 }
 resource "aws_instance" "app-server-2" {
   ami                         = data.aws_ami.amazon_linux2.id
@@ -77,21 +84,6 @@ resource "aws_instance" "db-server" {
 
   tags = {
     Name    = "${var.project}-${var.environment}-db-ec2"
-    project = var.project
-    Env     = var.environment
-  }
-}
-
-# ------------------------
-# Elastic IP
-# ------------------------
-resource "aws_eip" "nat_gateway" {
-  vpc        = true
-  instance   = aws_instance.bastion-server.id
-  depends_on = [aws_internet_gateway.igw]
-
-  tags = {
-    Name    = "${var.project}-${var.environment}-eip"
     project = var.project
     Env     = var.environment
   }

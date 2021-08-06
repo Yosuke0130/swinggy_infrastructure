@@ -15,3 +15,11 @@ data "aws_ami" "amazon_linux2" {
     values = ["hvm"]
   }
 }
+
+data "aws_subnet_ids" "selected" {
+  vpc_id = aws_vpc.vpc.id
+  filter {
+    name   = "tag:Name"
+    values = ["${var.project}-${var.environment}-private-subnet-app*"]
+  }
+}

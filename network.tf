@@ -28,7 +28,7 @@ resource "aws_subnet" "public_subnet_bastion" {
     Name    = "${var.project}-${var.environment}-public-subnet-bastion"
     project = var.project
     Env     = var.environment
-    type    = "public"
+    type    = "bastion"
   }
 }
 
@@ -39,10 +39,10 @@ resource "aws_subnet" "private_subnet_app" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name    = "${var.project}-${var.environment}-public-subnet-app"
+    Name    = "${var.project}-${var.environment}-private-subnet-app"
     project = var.project
     Env     = var.environment
-    type    = "private"
+    type    = "app"
   }
 }
 resource "aws_subnet" "private_subnet_app_2" {
@@ -52,10 +52,10 @@ resource "aws_subnet" "private_subnet_app_2" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name    = "${var.project}-${var.environment}-public-subnet-app_2"
+    Name    = "${var.project}-${var.environment}-private-subnet-app_2"
     project = var.project
     Env     = var.environment
-    type    = "private"
+    type    = "app"
   }
 }
 
@@ -66,10 +66,10 @@ resource "aws_subnet" "private_subnet_db" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name    = "${var.project}-${var.environment}-public-subnet-db"
+    Name    = "${var.project}-${var.environment}-private-subnet-db"
     project = var.project
     Env     = var.environment
-    type    = "private"
+    type    = "db"
   }
 }
 
@@ -133,4 +133,9 @@ resource "aws_route" "public_rt_igw_r" {
   route_table_id         = aws_route_table.public_rt_bastion.id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.igw.id
+}
+resource "aws_route" "private_rt_igw_r" {
+  route_table_id         = aws_route_table.private_rt_app.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.nat_gateway.id
 }
